@@ -1,5 +1,4 @@
-# Hey-2-...
-name: tmate session with RL-Swarm Node
+name: tmate session
 
 on: [push]
 
@@ -7,50 +6,5 @@ jobs:
   ssh:
     runs-on: ubuntu-latest
     steps:
-      # Step 1: Check out the repository (if needed for your code)
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      # Step 2: Install dependencies for RL-Swarm
-      - name: Install dependencies
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y screen curl iptables build-essential git wget lz4 jq make gcc nano automake autoconf tmux htop nvme-cli libgbm1 pkg-config libssl-dev libleveldb-dev tar clang bsdmainutils ncdu unzip
-
-      # Step 3: Clone the RL-Swarm repository
-      - name: Clone RL-Swarm repository
-        run: |
-          git clone https://github.com/gensyn-ai/rl-swarm.git
-          cd rl-swarm
-
-      # Step 4: Write swarm.pem from GitHub Secrets
-      - name: Write swarm.pem
-        env:
-          SWARM_PEM: ${{ secrets.SWARM_PEM }}
-        run: |
-          echo "$SWARM_PEM" > rl-swarm/swarm.pem
-          chmod 600 rl-swarm/swarm.pem  # Set correct permissions for the private key
-
-      # Step 5: Set up and run the RL-Swarm node
-      - name: Set up RL-Swarm node
-        run: |
-          cd rl-swarm
-          # Verify swarm.pem exists
-          if [ -f swarm.pem ]; then
-            echo "swarm.pem successfully created"
-          else
-            echo "swarm.pem not found!"
-            exit 1
-          fi
-          # Run the RL-Swarm node setup script
-          bash run_rl_swarm.sh
-        env:
-          PUB_MULTI_ADDRS: ""  # Default public multi-address
-          PEER_MULTI_ADDRS: "/ip4/38.101.215.13/tcp/30002/p2p/QmQ2gEXoPJg6iMBSUFWGzAabS2VhnzuS782Y637hGjfsRJ"  # Default peer multi-address
-          HOST_MULTI_ADDRS: "/ip4/0.0.0.0/tcp/38331"  # Default host multi-address
-          CONNECT_TO_TESTNET: "true"  # Connect to Gensyn Testnet
-          IDENTITY_PATH: "swarm.pem"  # Path to the identity file
-
-      # Step 6: Setup tmate session for debugging
       - name: Setup tmate session
         uses: mxschmitt/action-tmate@v3
